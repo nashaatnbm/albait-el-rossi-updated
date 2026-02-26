@@ -1,0 +1,96 @@
+<%- include('../partials/header') %>
+
+<div style="max-width:1100px;margin:30px auto;padding:0 24px;">
+  <h1 style="font-size:24px;font-weight:800;margin-bottom:24px;">🛒 إتمام الطلب</h1>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error" style="margin-bottom:20px;">⚠️ <%= error %></div>
+  <% } %>
+
+  <form method="POST" action="/checkout" id="checkout-form">
+    <div class="checkout-page">
+
+      <!-- Left: Products + Shipping -->
+      <div>
+        <!-- Products -->
+        <div class="checkout-section">
+          <h2>📦 اختر المنتجات</h2>
+          <div class="products-list">
+            <% products.forEach((p, i) => { %>
+            <div class="product-row">
+              <div class="product-emoji"><%= p.emoji %></div>
+              <div class="product-row-info">
+                <div class="product-row-name"><%= p.name %></div>
+                <div class="product-row-price"><%= p.price %> ريال / قطعة</div>
+              </div>
+              <input
+                type="hidden"
+                name="items[<%= i %>][productId]"
+                value="<%= p.id %>"
+              >
+              <input
+                type="number"
+                name="items[<%= i %>][quantity]"
+                class="qty-input"
+                data-price="<%= p.price %>"
+                data-name="<%= p.name %>"
+                min="0"
+                max="99"
+                value="0"
+                placeholder="0"
+              >
+            </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- Shipping Info -->
+        <div class="checkout-section">
+          <h2>🚚 بيانات الشحن</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label class="form-label">الاسم الكامل</label>
+              <input type="text" name="fullName" class="form-input" placeholder="محمد أحمد" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">رقم الهاتف</label>
+              <input type="tel" name="phone" class="form-input" placeholder="+966 5xxxxxxxx" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">المدينة / الدولة</label>
+              <input type="text" name="city" class="form-input" placeholder="الرياض، السعودية" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">العنوان التفصيلي</label>
+              <input type="text" name="address" class="form-input" placeholder="الحي، الشارع، رقم المبنى" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ملاحظات (اختياري)</label>
+            <input type="text" name="notes" class="form-input" placeholder="أي تعليمات خاصة للتوصيل...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Summary -->
+      <div class="order-summary">
+        <div class="summary-title">📋 ملخص الطلب</div>
+        <div class="summary-items" id="summary-items">
+          <p style="color:#666;font-size:13px">لم تختر أي منتج بعد</p>
+        </div>
+        <div class="summary-total">
+          <span>الإجمالي:</span>
+          <span id="summary-total">0 ر.س</span>
+        </div>
+        <button type="submit" class="btn-checkout">
+          ✅ تأكيد الطلب
+        </button>
+        <p style="text-align:center;font-size:12px;color:#666;margin-top:12px;">
+          🔒 الدفع عند الاستلام
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

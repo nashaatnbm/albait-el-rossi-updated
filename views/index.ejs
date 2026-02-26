@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-card">
+    <div class="hero-content">
+      <span class="hero-badge">⭐ عروض نهاية الأسبوع</span>
+      <h1 class="hero-title">
+        أفضل المنتجات<br>
+        الروسية <span>الأصيلة</span><br>
+        لبيتك
+      </h1>
+      <p class="hero-sub">نجلب لك أجود المنتجات الروسية مباشرة من المصنع — شوكولاتة، شاي، فراء، سكاكين وأكثر. توصيل سريع للسعودية والإمارات وجميع الدول العربية.</p>
+      <div class="hero-btns">
+        <a href="/checkout" class="btn-primary">تسوق الآن ←</a>
+        <a href="#products" class="btn-secondary">اكتشف العروض</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-val">⭐ 4.9</span><span class="stat-label">تقييم العملاء</span></div>
+        <div class="stat"><span class="stat-val">17+</span><span class="stat-label">دولة توصيل</span></div>
+        <div class="stat"><span class="stat-val">5000+</span><span class="stat-label">طلب ناجح</span></div>
+      </div>
+    </div>
+    <div class="hero-bear">🐻</div>
+  </div>
+</section>
+
+<!-- Products -->
+<section class="section" id="products">
+  <h2 class="section-title">🛍️ منتجاتنا المميزة</h2>
+  <div class="products-grid">
+    <% products.forEach(product => { %>
+    <div class="product-card">
+      <div class="product-img">
+        <% if (product.badge) { %>
+          <span class="product-badge badge-<%= product.badgeColor %>"><%= product.badge %></span>
+        <% } %>
+        <%= product.emoji %>
+      </div>
+      <div class="product-info">
+        <div class="product-cat"><%= product.category %></div>
+        <div class="product-name"><%= product.name %></div>
+        <% if (product.description) { %>
+          <div class="product-desc"><%= product.description %></div>
+        <% } %>
+        <div class="product-footer">
+          <div>
+            <div class="product-price"><%= product.price %> <span>ريال</span></div>
+            <% if (product.originalPrice) { %>
+              <div class="product-original-price"><%= product.originalPrice %> ريال</div>
+            <% } %>
+          </div>
+          <button class="btn-add-cart" onclick="addToCart(this, '<%= product.name.replace(/'/g, &quot;\\&#39;&quot;) %>', <%= product.price %>)">+</button>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+    <div class="product-card" style="display:flex;align-items:center;justify-content:center;min-height:200px;">
+      <a href="/checkout" class="btn-primary" style="text-align:center">اطلب الآن 🛒</a>
+    </div>
+  </div>
+</section>
+
+<script>
+function addToCart(btn, name, price) {
+  fetch('/cart/add', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, price, quantity: 1 })
+  }).then(res => {
+    if (res.ok) {
+      btn.textContent = '✓';
+      btn.style.background = '#28a745';
+      setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1500);
+      // Update cart badge
+      const badge = document.querySelector('.cart-badge');
+      if (badge) badge.textContent = parseInt(badge.textContent || 0) + 1;
+    } else if (res.status === 401) {
+      window.location.href = '/auth/login';
+    }
+  }).catch(() => {
+    btn.textContent = '✓';
+    btn.style.background = '#28a745';
+    setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; }, 1500);
+  });
+}
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | البيت الروسي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Announcement Bar -->
+<div class="announcement-bar">
+  <span>🚚 شحن مجاني للطلبات فوق 200 ريال</span>
+  <span class="sep">|</span>
+  <span>🎁 منتجات روسية أصيلة 100٪</span>
+  <span class="sep">|</span>
+  <span>📦 توصيل لجميع الدول العربية</span>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="/" class="logo">
+      <span class="logo-ar">البيت الروسي</span>
+      <span class="logo-en">AL-BAIT AL-RUSSI</span>
+      <span class="logo-ru">RU</span>
+    </a>
+
+    <div class="nav-search">
+      <input type="text" placeholder="ابحث عن منتجات روسية..." class="search-input">
+      <button class="search-btn">🔍</button>
+    </div>
+
+    <div class="nav-actions">
+      <% if (currentUser) { %>
+        <div class="user-menu">
+          <span class="user-name">👤 <%= currentUser.name %></span>
+          <div class="dropdown">
+            <a href="/my-orders">طلباتي</a>
+            <% if (currentUser.role === 'admin') { %>
+              <a href="/admin">لوحة التحكم</a>
+            <% } %>
+            <a href="/auth/logout">تسجيل الخروج</a>
+          </div>
+        </div>
+      <% } else { %>
+        <a href="/auth/login" class="btn-login">تسجيل الدخول</a>
+      <% } %>
+      <a href="/checkout" class="btn-order">اطلب الآن 🛒</a>
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="nav-cats">
+    <a href="/" class="cat-link active">🏠 الكل</a>
+    <a href="/?cat=شوكولاتة وحلويات" class="cat-link">🍫 شوكولاتة وحلويات</a>
+    <a href="/?cat=شاي وقهوة" class="cat-link">☕ شاي وقهوة</a>
+    <a href="/?cat=فراء روسي" class="cat-link">🧥 فراء روسي</a>
+    <a href="/?cat=سكاكين" class="cat-link">🔪 سكاكين</a>
+    <a href="/?cat=مستحضرات تجميل" class="cat-link">💄 مستحضرات تجميل</a>
+    <a href="/?cat=مكملات غذائية" class="cat-link">💊 مكملات غذائية</a>
+  </div>
+</nav>

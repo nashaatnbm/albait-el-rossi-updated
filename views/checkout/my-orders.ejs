@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+
+<div class="my-orders-page">
+  <h1 class="page-title">📦 طلباتي</h1>
+
+  <% if (orders.length === 0) { %>
+    <div style="text-align:center;padding:60px 20px;">
+      <div style="font-size:60px;margin-bottom:16px">📭</div>
+      <p style="color:#a0a0b0;font-size:16px;">لم تقم بأي طلب بعد</p>
+      <a href="/checkout" class="btn-primary" style="display:inline-block;margin-top:20px;">اطلب الآن</a>
+    </div>
+  <% } else { %>
+    <div class="order-list">
+      <% orders.forEach(order => { %>
+      <div class="order-list-card">
+        <div class="order-list-header">
+          <span class="order-list-id">#<%= order._id.toString().slice(-6).toUpperCase() %></span>
+          <span class="status-badge status-<%= order.status %>">
+            <% const labels = { pending:'قيد الانتظار', processing:'قيد التنفيذ', completed:'مكتمل', cancelled:'ملغي' } %>
+            <%= labels[order.status] || order.status %>
+          </span>
+        </div>
+        <div class="order-list-items">
+          <%= order.items.map(i => `${i.productName} ×${i.quantity}`).join(' — ') %>
+        </div>
+        <div class="order-list-footer">
+          <span class="order-list-total"><%= order.totalAmount %> ريال</span>
+          <span class="order-list-date"><%= new Date(order.createdAt).toLocaleDateString('ar-EG') %></span>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

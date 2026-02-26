@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+
+<div class="success-page">
+  <div class="success-icon">🎉</div>
+  <h1 class="success-title">تم استلام طلبك!</h1>
+  <p class="success-sub">شكراً لك. سنتواصل معك قريباً لتأكيد الطلب والشحن.</p>
+
+  <div class="order-card">
+    <h3>📋 تفاصيل الطلب</h3>
+    <div class="order-meta">
+      <div class="meta-row">
+        <span class="meta-label">رقم الطلب</span>
+        <span style="font-family:monospace;color:#d4af37;">#<%= order._id.toString().slice(-6).toUpperCase() %></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">اسم العميل</span>
+        <span><%= order.user.name %></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">المدينة</span>
+        <span><%= order.shippingAddress.city %></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">الهاتف</span>
+        <span><%= order.shippingAddress.phone %></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-label">الحالة</span>
+        <span class="status-badge status-pending">قيد الانتظار</span>
+      </div>
+    </div>
+
+    <h3>📦 المنتجات</h3>
+    <% order.items.forEach(item => { %>
+    <div class="summary-item">
+      <span><%= item.productName %> ×<%= item.quantity %></span>
+      <span><%= item.price * item.quantity %> ريال</span>
+    </div>
+    <% }) %>
+
+    <div class="summary-total" style="margin-top:16px;padding-top:16px;border-top:2px solid #d4af37;">
+      <span>الإجمالي</span>
+      <span><%= order.totalAmount %> ريال</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+    <a href="/my-orders" class="btn-primary">عرض جميع طلباتي</a>
+    <a href="/" class="btn-secondary">العودة للرئيسية</a>
+  </div>
+
+  <!-- WhatsApp confirmation notice -->
+  <div class="whatsapp-notice">
+    <div class="wa-icon">💬</div>
+    <h3>سيتم التواصل معك لتأكيد الدفع</h3>
+    <p>
+      سيقوم فريقنا بالتواصل معك قريباً عبر <strong>واتساب</strong><br>
+      على الرقم المسجل لتأكيد الطلب وإتمام عملية الدفع.
+    </p>
+    <a href="https://wa.me/<%= process.env.WHATSAPP_NUMBER || '966500000000' %>?text=<%= encodeURIComponent('مرحباً، أريد تأكيد طلبي رقم #' + order._id.toString().slice(-6).toUpperCase()) %>" 
+       target="_blank" 
+       class="btn-whatsapp">
+      📲 تواصل معنا الآن عبر واتساب
+    </a>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المنتجات | البيت الروسي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .products-table { width: 100%; border-collapse: collapse; }
+    .products-table th, .products-table td { 
+      padding: 12px 16px; 
+      text-align: right; 
+      border-bottom: 1px solid #2a2a4a; 
+      font-size: 14px;
+    }
+    .products-table th { 
+      background: #1a1a35; 
+      color: var(--accent-gold); 
+      font-weight: 700; 
+      font-size: 13px;
+    }
+    .products-table tr:hover { background: rgba(255,255,255,0.02); }
+    .emoji-cell { font-size: 28px; text-align: center; }
+    .btn-edit { 
+      background: #2a4a6a; color: #7ab8e8; 
+      border: none; padding: 6px 14px; border-radius: 7px; 
+      cursor: pointer; font-family: 'Tajawal',sans-serif; font-size: 13px;
+      transition: all 0.2s;
+    }
+    .btn-edit:hover { background: #3a6a9a; }
+    .btn-delete { 
+      background: #4a1a1a; color: #e07070; 
+      border: none; padding: 6px 14px; border-radius: 7px; 
+      cursor: pointer; font-family: 'Tajawal',sans-serif; font-size: 13px;
+      transition: all 0.2s;
+    }
+    .btn-delete:hover { background: #6a2a2a; }
+    .btn-toggle { 
+      padding: 4px 10px; border-radius: 20px; 
+      border: none; cursor: pointer; font-size: 12px;
+      font-family: 'Tajawal',sans-serif; transition: all 0.2s;
+    }
+    .btn-toggle.active { background: #1a4a2a; color: #4ade80; }
+    .btn-toggle.inactive { background: #4a1a1a; color: #f87171; }
+
+    /* Modal */
+    .modal-overlay { 
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); 
+      z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal { 
+      background: #12122a; border: 1px solid #2a2a4a; 
+      border-radius: 16px; padding: 32px; width: 100%; max-width: 540px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-title { font-size: 20px; font-weight: 800; margin-bottom: 24px; color: var(--accent-gold); }
+    .modal .form-group { margin-bottom: 16px; }
+    .modal .form-label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
+    .modal .form-input { 
+      width: 100%; background: #1a1a35; border: 1px solid #2a2a4a; 
+      border-radius: 8px; padding: 10px 14px; color: #fff; 
+      font-family: 'Tajawal',sans-serif; font-size: 14px; box-sizing: border-box;
+    }
+    .modal .form-input:focus { outline: none; border-color: var(--accent-gold); }
+    .modal select.form-input { cursor: pointer; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-save { 
+      flex: 1; background: var(--accent-gold); color: #000; 
+      border: none; padding: 12px; border-radius: 10px; 
+      font-weight: 700; font-size: 15px; cursor: pointer; 
+      font-family: 'Tajawal',sans-serif; transition: all 0.2s;
+    }
+    .btn-save:hover { background: #f0c040; }
+    .btn-cancel { 
+      background: #2a2a4a; color: #ccc; 
+      border: none; padding: 12px 20px; border-radius: 10px; 
+      cursor: pointer; font-family: 'Tajawal',sans-serif; transition: all 0.2s;
+    }
+    .btn-cancel:hover { background: #3a3a5a; }
+    .emoji-picker { 
+      display: flex; flex-wrap: wrap; gap: 8px; 
+      background: #1a1a35; padding: 12px; border-radius: 8px; margin-top: 8px;
+    }
+    .emoji-opt { 
+      font-size: 24px; cursor: pointer; padding: 4px 6px; 
+      border-radius: 6px; transition: background 0.2s;
+    }
+    .emoji-opt:hover, .emoji-opt.selected { background: #2a2a5a; }
+    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge-preview { 
+      display: inline-block; padding: 3px 10px; border-radius: 20px; 
+      font-size: 12px; font-weight: 700;
+    }
+    .badge-green { background: #1a4a2a; color: #4ade80; }
+    .badge-red { background: #4a1a1a; color: #f87171; }
+    .badge-gold { background: #4a3a00; color: var(--accent-gold); }
+    .price-cell { color: var(--accent-gold); font-weight: 700; font-size: 15px; }
+    .original-price { text-decoration: line-through; color: #666; font-size: 12px; margin-right: 6px; }
+
+    .alert-success { 
+      background: #1a4a2a; border: 1px solid #4ade80; 
+      color: #4ade80; padding: 12px 18px; border-radius: 10px; margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">🐻 البيت الروسي<br><small style="font-size:10px;color:#666;font-weight:400">لوحة التحكم</small></div>
+    <a href="/admin" class="sidebar-link">📊 الطلبات</a>
+    <a href="/admin/products" class="sidebar-link active">📦 المنتجات</a>
+    <a href="/admin/customers" class="sidebar-link">👥 العملاء</a>
+    <a href="/" class="sidebar-link">🏠 الموقع</a>
+    <a href="/auth/logout" class="sidebar-link" style="margin-top:auto;color:#e05252;">🚪 تسجيل الخروج</a>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <div class="admin-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <h1>📦 إدارة المنتجات</h1>
+        <p>أضف أو عدّل أو احذف المنتجات من هنا مباشرة بدون تغيير الكود</p>
+      </div>
+      <button class="btn-save" style="flex:none;padding:12px 24px;border-radius:10px;" onclick="openAddModal()">
+        + إضافة منتج جديد
+      </button>
+    </div>
+
+    <% if (typeof flash !== 'undefined' && flash) { %>
+      <div class="alert-success">✅ <%= flash %></div>
+    <% } %>
+
+    <!-- Products Table -->
+    <div class="admin-card" style="overflow-x:auto;">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>الإيموجي</th>
+            <th>اسم المنتج</th>
+            <th>الفئة</th>
+            <th>السعر</th>
+            <th>الشارة</th>
+            <th>الحالة</th>
+            <th>الترتيب</th>
+            <th>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (products.length === 0) { %>
+          <tr>
+            <td colspan="8" style="text-align:center;color:#666;padding:40px;">لا توجد منتجات بعد. اضغط "إضافة منتج جديد"</td>
+          </tr>
+          <% } %>
+          <% products.forEach(product => { %>
+          <tr id="row-<%= product._id %>">
+            <td class="emoji-cell"><%= product.emoji %></td>
+            <td style="font-weight:600;"><%= product.name %></td>
+            <td style="color:#888;font-size:13px;"><%= product.category %></td>
+            <td class="price-cell">
+              <%= product.price %> ريال
+              <% if (product.originalPrice) { %>
+                <span class="original-price"><%= product.originalPrice %></span>
+              <% } %>
+            </td>
+            <td>
+              <% if (product.badge) { %>
+                <span class="badge-preview badge-<%= product.badgeColor %>"><%= product.badge %></span>
+              <% } else { %>
+                <span style="color:#555;">—</span>
+              <% } %>
+            </td>
+            <td>
+              <button class="btn-toggle <%= product.inStock ? 'active' : 'inactive' %>" 
+                      onclick="toggleStock('<%= product._id %>', this)">
+                <%= product.inStock ? '✓ متوفر' : '✗ نفد' %>
+              </button>
+            </td>
+            <td style="color:#888;text-align:center;"><%= product.order %></td>
+            <td>
+              <div class="row-actions">
+                <button class="btn-edit" onclick='openEditModal(<%= JSON.stringify(product) %>)'>✏️ تعديل</button>
+                <button class="btn-delete" onclick="deleteProduct('<%= product._id %>', '<%= product.name %>')">🗑️ حذف</button>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">إضافة منتج جديد</div>
+    <form id="productForm">
+      <input type="hidden" id="productId">
+
+      <div class="form-group">
+        <label class="form-label">اسم المنتج *</label>
+        <input type="text" id="pName" class="form-input" placeholder="مثال: شوكولاتة ميشكا" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الفئة *</label>
+        <input type="text" id="pCategory" class="form-input" list="categories-list" placeholder="مثال: شوكولاتة وحلويات" required>
+        <datalist id="categories-list">
+          <% categories.forEach(c => { %><option value="<%= c %>"><% }) %>
+        </datalist>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label class="form-label">السعر (ريال) *</label>
+          <input type="number" id="pPrice" class="form-input" placeholder="45" min="0" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">السعر الأصلي (قبل الخصم)</label>
+          <input type="number" id="pOriginalPrice" class="form-input" placeholder="60" min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">وصف المنتج (اختياري)</label>
+        <input type="text" id="pDescription" class="form-input" placeholder="وصف قصير للمنتج">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">الإيموجي</label>
+        <input type="text" id="pEmoji" class="form-input" placeholder="🍫" maxlength="4" style="font-size:24px;width:80px;">
+        <div class="emoji-picker">
+          <% ['🍫','🍵','🧥','🔪','💄','💊','🍯','🧴','🫖','🍬','🧁','🍷','🫙','🧆','🎁','📦','🛒','⭐'].forEach(e => { %>
+            <span class="emoji-opt" onclick="selectEmoji('<%= e %>')" data-emoji="<%= e %>"><%= e %></span>
+          <% }) %>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label class="form-label">الشارة</label>
+          <select id="pBadge" class="form-input">
+            <option value="">بدون شارة</option>
+            <option value="جديد">جديد</option>
+            <option value="الأكثر مبيعاً">الأكثر مبيعاً</option>
+            <option value="خصم">خصم</option>
+            <option value="نفد المخزون">نفد المخزون</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">لون الشارة</label>
+          <select id="pBadgeColor" class="form-input">
+            <option value="green">أخضر</option>
+            <option value="red">أحمر</option>
+            <option value="gold">ذهبي</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الترتيب</label>
+          <input type="number" id="pOrder" class="form-input" placeholder="1" min="0" value="0">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;margin-top:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+          <input type="checkbox" id="pInStock" checked style="width:16px;height:16px;accent-color:var(--accent-gold);">
+          متوفر في المخزون
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;">
+          <input type="checkbox" id="pFeatured" style="width:16px;height:16px;accent-color:var(--accent-gold);">
+          منتج مميز
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn-save" id="saveBtn">💾 حفظ المنتج</button>
+        <button type="button" class="btn-cancel" onclick="closeModal()">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'إضافة منتج جديد';
+  document.getElementById('productId').value = '';
+  document.getElementById('productForm').reset();
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  document.getElementById('pEmoji').value = '📦';
+  document.getElementById('productModal').classList.add('open');
+}
+
+function openEditModal(product) {
+  document.getElementById('modalTitle').textContent = 'تعديل: ' + product.name;
+  document.getElementById('productId').value = product._id;
+  document.getElementById('pName').value = product.name;
+  document.getElementById('pCategory').value = product.category;
+  document.getElementById('pPrice').value = product.price;
+  document.getElementById('pOriginalPrice').value = product.originalPrice || '';
+  document.getElementById('pDescription').value = product.description || '';
+  document.getElementById('pEmoji').value = product.emoji || '📦';
+  document.getElementById('pBadge').value = product.badge || '';
+  document.getElementById('pBadgeColor').value = product.badgeColor || 'green';
+  document.getElementById('pOrder').value = product.order || 0;
+  document.getElementById('pInStock').checked = product.inStock;
+  document.getElementById('pFeatured').checked = product.featured;
+  // Highlight emoji
+  document.querySelectorAll('.emoji-opt').forEach(e => {
+    e.classList.toggle('selected', e.dataset.emoji === product.emoji);
+  });
+  document.getElementById('productModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+}
+
+function selectEmoji(emoji) {
+  document.getElementById('pEmoji').value = emoji;
+  document.querySelectorAll('.emoji-opt').forEach(e => {
+    e.classList.toggle('selected', e.dataset.emoji === emoji);
+  });
+}
+
+document.getElementById('productForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('productId').value;
+  const data = {
+    name: document.getElementById('pName').value,
+    category: document.getElementById('pCategory').value,
+    price: parseFloat(document.getElementById('pPrice').value),
+    originalPrice: parseFloat(document.getElementById('pOriginalPrice').value) || null,
+    description: document.getElementById('pDescription').value,
+    emoji: document.getElementById('pEmoji').value || '📦',
+    badge: document.getElementById('pBadge').value,
+    badgeColor: document.getElementById('pBadgeColor').value,
+    order: parseInt(document.getElementById('pOrder').value) || 0,
+    inStock: document.getElementById('pInStock').checked,
+    featured: document.getElementById('pFeatured').checked
+  };
+
+  const url = id ? `/admin/products/${id}` : '/admin/products';
+  const method = id ? 'PUT' : 'POST';
+
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ جاري الحفظ...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      closeModal();
+      location.reload();
+    } else {
+      alert('خطأ: ' + result.message);
+    }
+  } catch(err) {
+    alert('حدث خطأ في الاتصال');
+  } finally {
+    btn.textContent = '💾 حفظ المنتج';
+    btn.disabled = false;
+  }
+});
+
+async function deleteProduct(id, name) {
+  if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
+  const res = await fetch(`/admin/products/${id}`, { method: 'DELETE' });
+  const result = await res.json();
+  if (result.success) {
+    document.getElementById('row-' + id)?.remove();
+  } else {
+    alert('خطأ في الحذف');
+  }
+}
+
+async function toggleStock(id, btn) {
+  const res = await fetch(`/admin/products/${id}/toggle-stock`, { method: 'POST' });
+  const result = await res.json();
+  if (result.success) {
+    btn.textContent = result.inStock ? '✓ متوفر' : '✗ نفد';
+    btn.className = 'btn-toggle ' + (result.inStock ? 'active' : 'inactive');
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('productModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>العملاء | البيت الروسي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">🐻 البيت الروسي<br><small style="font-size:10px;color:#666;font-weight:400">لوحة التحكم</small></div>
+    <a href="/admin" class="sidebar-link">📊 الطلبات</a>
+    <a href="/admin/products" class="sidebar-link">📦 المنتجات</a>
+    <a href="/admin/customers" class="sidebar-link active">👥 العملاء</a>
+    <a href="/" class="sidebar-link">🏠 الموقع</a>
+    <a href="/auth/logout" class="sidebar-link" style="color:#e05252;">🚪 تسجيل الخروج</a>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>👥 العملاء</h1>
+      <p>إجمالي العملاء: <%= customers.length %></p>
+    </div>
+
+    <% if (customers.length === 0) { %>
+      <div style="text-align:center;padding:60px;color:#666;">لا يوجد عملاء بعد</div>
+    <% } else { %>
+    <div class="customers-grid">
+      <% customers.forEach(c => { %>
+      <a href="/admin/customer/<%= c._id %>/orders" class="customer-card">
+        <div class="customer-avatar"><%= c.name.charAt(0) %></div>
+        <div class="customer-name-card"><%= c.name %></div>
+        <div class="customer-email"><%= c.email %></div>
+        <% if (c.phone) { %>
+          <div class="customer-email">📞 <%= c.phone %></div>
+        <% } %>
+        <div class="customer-stats">
+          <div class="cstat">
+            <div class="cstat-val"><%= c.orderCount %></div>
+            <div class="cstat-label">طلب</div>
+          </div>
+          <div class="cstat">
+            <div class="cstat-val"><%= c.totalSpent %></div>
+            <div class="cstat-label">ريال</div>
+          </div>
+          <div class="cstat">
+            <div class="cstat-val"><%= new Date(c.createdAt).toLocaleDateString('ar-EG') %></div>
+            <div class="cstat-label">تاريخ التسجيل</div>
+          </div>
+        </div>
+      </a>
+      <% }) %>
+    </div>
+    <% } %>
+  </main>
+</div>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
