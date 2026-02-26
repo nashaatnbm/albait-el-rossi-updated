@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 // ===== Database =====
-mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://Nashaat:<mnbvcxzNn9900>@cluster0.nyrqiul.mongodb.net/?appName=Cluster0')
+mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://Nashaat:mnbvcxzNn9900@cluster0.nyrqiul.mongodb.net/?appName=Cluster0')
   .then(async () => {
     console.log('✅ MongoDB connected');
     await seedProducts();
@@ -38,10 +38,10 @@ app.use(session({
   saveUninitialized: false,
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI || 'mongodb://localhost:27017/albait-el-rossi',
-    ttl: 7 * 24 * 60 * 60 // 7 days
+    ttl: 7 * 24 * 60 * 60
   }),
   cookie: {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true
   }
 }));
@@ -67,11 +67,8 @@ app.use('/', checkoutRoutes);
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).render('error', {app.use((req, res, next) => {
-  res.locals.title = 'البيت الروسي';
-  next();
-});
-
+  res.status(404).render('error', {
+    title: 'الصفحة غير موجودة',
     message: 'الصفحة التي تبحث عنها غير موجودة',
     user: req.session
   });
@@ -80,11 +77,8 @@ app.use((req, res) => {
 // Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render('error', {app.use((req, res, next) => {
-  res.locals.title = 'البيت الروسي';
-  next();
-});
-
+  res.status(500).render('error', {
+    title: 'خطأ في الخادم',
     message: 'حدث خطأ في الخادم',
     user: req.session
   });
