@@ -67,7 +67,11 @@ app.use('/', checkoutRoutes);
 
 // 404 Handler
 app.use((req, res) => {
-  res.status(404).render('error', {
+  res.status(404).render('error', {app.use((req, res, next) => {
+  res.locals.title = 'البيت الروسي';
+  next();
+});
+
     message: 'الصفحة التي تبحث عنها غير موجودة',
     user: req.session
   });
@@ -76,7 +80,11 @@ app.use((req, res) => {
 // Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render('error', {
+  res.status(500).render('error', {app.use((req, res, next) => {
+  res.locals.title = 'البيت الروسي';
+  next();
+});
+
     message: 'حدث خطأ في الخادم',
     user: req.session
   });
